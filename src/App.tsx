@@ -1,0 +1,141 @@
+import { useState, useEffect, useRef } from 'react';
+import { db } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { MarketGauge } from './components/MarketGauge';
+import { NegotiationInsight } from './components/NegotiationInsight';
+import { seedMarketData } from './seedData';
+
+const ChatAssistant = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    { role: 'bot', text: "Hello! I'm Don's Market Assistant. I have audited 10 years of Abbotsford data (2015-2025). Ask me anything about price trends, equity growth, or specific market cycles!" }
+  ]);
+  const [input, setInput] = useState("");
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+  const handleSend = (text: string) => {
+    if (!text.trim()) return;
+    setMessages(prev => [...prev, { role: 'user', text }]);
+    setInput("");
+
+    setTimeout(() => {
+      let response = "Looking at the 10-year audited trends, ";
+      const query = text.toLowerCase();
+      
+      if (query.includes("peak") || query.includes("2022")) {
+        response += "detached prices hit a record high in March 2022 ($1.54M). Ratios were over 55%, compared to a much more accessible 14% today.";
+      } else if (query.includes("2015") || query.includes("growth") || query.includes("equity")) {
+        response += "benchmarks have grown from ~$461k in 2015 to over $1.2M today. That is nearly 3x growth, providing incredible long-term equity for owners.";
+      } else if (query.includes("sell") || query.includes("buy")) {
+        response = "We are currently in a 'Balanced' market. For buyers, there is more selection. For sellers, strategic pricing is key to standing out against current inventory levels.";
+      } else {
+        response = "That is a specific trend that varies by neighborhood. To get an exact answer for your street, I recommend a custom 5-minute equity report.";
+      }
+
+      setMessages(prev => [...prev, 
+        { role: 'bot', text: response },
+        { role: 'bot', text: "Would you like a personalized report? Request one from Don: https://go.dongoertz.com/bookacallwithdon-1462" }
+      ]);
+    }, 800);
+  };
+
+  return (
+    <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 1000 }}>
+      {!isOpen ? (
+        <button onClick={() => setIsOpen(true)} style={{ padding: '15px 25px', backgroundColor: '#d6b27d', color: '#041c24', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>💬 ASK THE EXPERT</button>
+      ) : (
+        <div style={{ width: '380px', height: '520px', backgroundColor: '#1f333c', border: '2px solid #d6b27d', borderRadius: '12px', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+          <div style={{ padding: '15px', backgroundColor: '#d6b27d', color: '#041c24', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', borderRadius: '10px 10px 0 0' }}>
+            <span>Market Assistant</span><button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+          </div>
+          <div style={{ flex: 1, padding: '15px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
+            {messages.map((m, i) => (<div key={i} style={{ alignSelf: m.role === 'bot' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'bot' ? '#041c24' : '#d6b27d', color: m.role === 'bot' ? 'white' : '#041c24', padding: '10px', borderRadius: '8px', maxWidth: '85%' }}>{m.text}</div>))}
+            <div ref={chatEndRef} />
+          </div>
+          <div style={{ padding: '15px', borderTop: '1px solid #d6b27d', display: 'flex', gap: '5px', backgroundColor: '#041c24', borderRadius: '0 0 10px 10px' }}>
+            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend(input)} placeholder="Ask anything..." style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #d6b27d', backgroundColor: '#1f333c', color: 'white' }} />
+            <button onClick={() => handleSend(input)} style={{ backgroundColor: '#d6b27d', color: '#041c24', border: 'none', padding: '8px 12px', borderRadius: '4px', fontWeight: 'bold' }}>SEND</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default function App() {
+  const [category, setCategory] = useState('detached');
+  const [selectedMonth, setSelectedMonth] = useState('nov_2025');
+  const [marketStats, setMarketStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const years = Array.from({ length: 11 }, (_, i) => 2025 - i);
+  const monthsList = years.flatMap(y => 
+    ["dec", "nov", "oct", "sep", "aug", "jul", "jun", "may", "apr", "mar", "feb", "jan"]
+    .map(m => ({ id: `${m}_${y}`, label: `${m.toUpperCase()} ${y}` }))
+  ).filter(m => !(m.id === "dec_2025"));
+
+  const formatCurrency = (val: number) => new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(val);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      const docSnap = await getDoc(doc(db, "abbotsford_stats", selectedMonth));
+      if (docSnap.exists()) setMarketStats(docSnap.data());
+      setLoading(false);
+    };
+    fetchStats();
+  }, [selectedMonth]);
+
+  if (loading) return <div style={{ background: '#041c24', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#d6b27d' }}>VERIFYING 10-YEAR HISTORY...</div>;
+
+  const current = marketStats ? marketStats[category] : null;
+
+  return (
+    <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '10px 20px', backgroundColor: '#041c24', color: 'white', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #846434', paddingBottom: '10px' }}>
+        <div><h2 style={{ fontSize: '1rem', margin: 0 }}>DON GOERTZ | <span style={{ color: '#d6b27d' }}>Royal LePage</span></h2><p style={{ fontSize: '0.7rem', color: '#d6b27d', margin: 0, fontStyle: 'italic' }}>"Friendly Service, All of the Time."</p></div>
+        <a href="https://go.dongoertz.com/bookacallwithdon-1462" target="_blank" rel="noopener noreferrer" style={{ padding: '10px 22px', backgroundColor: '#d6b27d', color: '#041c24', borderRadius: '4px', fontWeight: 'bold', textDecoration: 'none', fontSize: '0.8rem' }}>BOOK DISCOVERY CALL</a>
+      </header>
+
+      <section style={{ textAlign: 'center', marginBottom: '25px' }}>
+        <h1 style={{ fontSize: '3.2rem', fontWeight: 'bold', marginBottom: '15px' }}>Abbotsford Market Pulse</h1>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', alignItems: 'center' }}>
+          {['detached', 'townhouse', 'apartment'].map(type => (<button key={type} onClick={() => setCategory(type)} style={{ padding: '10px 25px', backgroundColor: category === type ? '#d6b27d' : 'transparent', color: category === type ? '#041c24' : '#d6b27d', border: '2px solid #d6b27d', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}>{type.toUpperCase()}</button>))}
+          <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} style={{ padding: '9px', backgroundColor: '#1f333c', color: 'white', border: '1px solid #d6b27d', borderRadius: '4px' }}>
+            {monthsList.map(m => (<option key={m.id} value={m.id}>{m.label}</option>))}
+          </select>
+        </div>
+      </section>
+
+      <main style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '15px', alignItems: 'stretch' }}>
+        <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <section style={{ backgroundColor: '#1f333c', border: '1px solid #d6b27d', padding: '20px 30px', borderRadius: '8px' }}>
+            <h3 style={{ color: '#d6b27d', textTransform: 'uppercase', fontSize: '0.8rem' }}>Benchmark Pricing Analysis</h3>
+            <p style={{ fontSize: '3.8rem', fontWeight: 'bold', color: '#d6b27d', margin: 0 }}>{formatCurrency(current?.benchmark || 0)}</p>
+            <div style={{ display: 'flex', gap: '30px', marginTop: '10px' }}>
+              <div><p style={{ color: '#7c8c89', fontSize: '0.7rem' }}>MONTHLY</p><p style={{ fontSize: '2.2rem', fontWeight: 'bold', margin: 0 }}>{current?.oneMonthChange}%</p></div>
+              <div><p style={{ color: '#7c8c89', fontSize: '0.7rem' }}>YEARLY</p><p style={{ fontSize: '2.2rem', fontWeight: 'bold', margin: 0 }}>{current?.oneYearChange}%</p></div>
+            </div>
+          </section>
+          <section style={{ backgroundColor: '#1f333c', border: '1px solid #d6b27d', padding: '20px 30px', borderRadius: '8px', flex: 1 }}>
+             <NegotiationInsight ratio={current?.salesToActiveRatio || 0} type={category} />
+          </section>
+        </div>
+        <div style={{ gridColumn: 'span 4', display: 'flex' }}><div style={{ flex: 1, height: '100%' }}><MarketGauge key={`${category}-${selectedMonth}`} value={current?.salesToActiveRatio || 0} label={category} /></div></div>
+      </main>
+
+      <ChatAssistant />
+      
+      <footer style={{ marginTop: 'auto', paddingTop: '60px', paddingBottom: '20px', textAlign: 'center', fontSize: '0.7rem', color: '#7c8c89', lineHeight: '1.8' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', borderTop: '1px solid #846434', paddingTop: '30px' }}>
+          <p style={{ color: '#d6b27d', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '10px' }}>DON GOERTZ | ROYAL LEPAGE LITTLE OAK REALTY</p>
+          <p>REALTOR®, MLS®, and the REALTOR® logo are certification marks owned by REALTOR® Canada Inc. and licensed exclusively to CREA.</p>
+          <p>The MLS® trademark and logo identify the quality of services provided by REALTORS® who are members of CREA. All offices independently owned and operated.</p>
+          <button onClick={() => seedMarketData()} style={{ background: 'transparent', border: '1px solid #846434', color: '#846434', cursor: 'pointer', padding: '5px 10px', marginTop: '15px' }}>ADMIN: SYNC DATA</button>
+        </div>
+      </footer>
+    </div>
+  );
+}

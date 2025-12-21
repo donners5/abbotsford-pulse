@@ -1,0 +1,46 @@
+/* DGA Brand Core Styles */
+:root {
+  --dga-navy: #041c24;
+  --dga-gold: #d6b27d;
+  --dga-slate: #1f333c;
+  --dga-bronze: #846434;
+  --dga-gray: #7c8c89;
+}
+
+body {
+  margin: 0;
+  background-color: var(--dga-navy);
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Custom 12-Column Grid Fallback */
+.dga-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
+  align-items: stretch;
+}
+
+.col-4 { grid-column: span 4; }
+.col-8 { grid-column: span 8; }
+
+/* Mobile View: Stack them vertically */
+@media (max-width: 1024px) {
+  .col-4, .col-8 { grid-column: span 12; }
+}
+
+.dga-card {
+  background-color: var(--dga-slate);
+  border: 1px solid var(--dga-bronze);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.dga-header {
+  text-align: center;
+  border-bottom: 1px solid var(--dga-bronze);
+  padding-bottom: 2rem;
+  margin-bottom: 4rem;
+}
