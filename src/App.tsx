@@ -6,12 +6,12 @@ import { NegotiationInsight } from './components/NegotiationInsight';
 import { seedMarketData } from './seedData';
 
 /**
- * Don's Market Assistant - Full Interactive Logic
+ * Don's Market Update Assistant - 10-Year Cycle Expert
  */
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Hello! I'm Don's Market Assistant. I have audited 10 years of Abbotsford data (2015-2025). You can ask me about price history, the 2022 peak, or current market strategy!" }
+    { role: 'bot', text: "Hello! I'm Don's Market Assistant. I have 10 years of Abbotsford data at my fingertips. Ask me anything about price trends or market cycles!" }
   ]);
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -24,16 +24,17 @@ const ChatAssistant = () => {
     setInput("");
 
     setTimeout(() => {
-      let res = "Looking at the 10-year audited history, ";
+      let res = "Looking at the 10-year trends for Abbotsford, ";
       const q = text.toLowerCase();
+      
       if (q.includes("peak") || q.includes("2022")) {
-        res += "Abbotsford Detached prices hit a record high in March 2022 ($1.54M). Market Pressure was at 55%, compared to a balanced 14% today.";
+        res += "detached prices hit a record high in March 2022 ($1.54M). Market Pressure was at 55%, compared to a balanced 14% today.";
       } else if (q.includes("2015") || q.includes("growth") || q.includes("equity")) {
-        res += "benchmarks have grown from ~$461k in 2015 to over $1.2M today. That is nearly 3x growth for long-term owners.";
+        res += "benchmarks have grown from ~$461k in 2015 to over $1.2M today. That is nearly 3x growth, which is incredible long-term equity for owners.";
       } else if (q.includes("sell") || q.includes("buy")) {
-        res = "We are currently in a 'Balanced' market. For buyers, there is more choice. For sellers, strategic pricing is essential to stand out against higher inventory levels.";
+        res = "We are currently in a 'Balanced' market. For buyers, there is more selection. For sellers, strategic pricing is key to standing out against current inventory levels.";
       } else {
-        res = "That's a great question about the Abbotsford market. To give you an exact answer for your specific neighborhood, let's look at a custom equity report.";
+        res = "Every neighborhood in Abbotsford is reacting differently right now. To see how this affects your specific home, I recommend a custom 5-minute equity report.";
       }
 
       setMessages(prev => [...prev, 
@@ -46,20 +47,21 @@ const ChatAssistant = () => {
   return (
     <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 1000 }}>
       {!isOpen ? (
-        <button onClick={() => setIsOpen(true)} style={{ padding: '15px 28px', backgroundColor: '#d6b27d', color: '#041c24', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 8px 20px rgba(0,0,0,0.4)' }}>💬 ASK THE MARKET ASSISTANT</button>
+        <button onClick={() => setIsOpen(true)} style={{ padding: '15px 25px', backgroundColor: '#d6b27d', color: '#041c24', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 8px 20px rgba(0,0,0,0.4)' }}>💬 ASK THE EXPERT</button>
       ) : (
-        <div style={{ width: '380px', height: '550px', backgroundColor: '#1f333c', border: '2px solid #d6b27d', borderRadius: '12px', display: 'flex', flexDirection: 'column', boxShadow: '0 15px 50px rgba(0,0,0,0.6)' }}>
+        <div style={{ width: '400px', height: '550px', backgroundColor: '#1f333c', border: '2px solid #d6b27d', borderRadius: '12px', display: 'flex', flexDirection: 'column', boxShadow: '0 15px 50px rgba(0,0,0,0.6)' }}>
           <div style={{ padding: '15px', backgroundColor: '#d6b27d', color: '#041c24', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', borderRadius: '10px 10px 0 0' }}>
-            <span>Market Assistant</span>
-            <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
+            <span>Don's Market Assistant</span><button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
           </div>
-          <div style={{ flex: 1, padding: '15px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-            {messages.map((m, i) => (<div key={i} style={{ alignSelf: m.role === 'bot' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'bot' ? '#041c24' : '#d6b27d', color: m.role === 'bot' ? 'white' : '#041c24', padding: '10px', borderRadius: '8px', maxWidth: '85%' }}>{m.text}</div>))}
+          <div style={{ flex: 1, padding: '15px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {messages.map((m, i) => (
+              <div key={i} style={{ alignSelf: m.role === 'bot' ? 'flex-start' : 'flex-end', backgroundColor: m.role === 'bot' ? '#041c24' : '#d6b27d', color: m.role === 'bot' ? 'white' : '#041c24', padding: '10px', borderRadius: '8px', maxWidth: '85%', fontSize: '0.85rem' }}>{m.text}</div>
+            ))}
             <div ref={chatEndRef} />
           </div>
           <div style={{ padding: '15px', borderTop: '1px solid #d6b27d', display: 'flex', gap: '10px', backgroundColor: '#041c24', borderRadius: '0 0 10px 10px' }}>
-            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend(input)} placeholder="Type your question..." style={{ flex: 1, padding: '10px', borderRadius: '4px', border: '1px solid #d6b27d', backgroundColor: '#1f333c', color: 'white' }} />
-            <button onClick={() => handleSend(input)} style={{ backgroundColor: '#d6b27d', color: '#041c24', border: 'none', padding: '10px 15px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>SEND</button>
+            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend(input)} placeholder="Ask anything..." style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #d6b27d', backgroundColor: '#1f333c', color: 'white' }} />
+            <button onClick={() => handleSend(input)} style={{ backgroundColor: '#d6b27d', color: '#041c24', border: 'none', padding: '8px 12px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>SEND</button>
           </div>
         </div>
       )}
@@ -73,6 +75,7 @@ export default function App() {
   const [marketStats, setMarketStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Generates dropdown options for the last 10 years
   const years = Array.from({ length: 11 }, (_, i) => 2025 - i);
   const monthsList = years.flatMap(y => 
     ["dec", "nov", "oct", "sep", "aug", "jul", "jun", "may", "apr", "mar", "feb", "jan"]
@@ -87,7 +90,7 @@ export default function App() {
       try {
         const docSnap = await getDoc(doc(db, "abbotsford_stats", selectedMonth));
         if (docSnap.exists()) setMarketStats(docSnap.data());
-      } catch (e) { console.error("Firebase error:", e); }
+      } catch (e) { console.error("Fetch error:", e); }
       setLoading(false);
     };
     fetchStats();
