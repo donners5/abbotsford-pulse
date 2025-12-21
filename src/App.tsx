@@ -5,8 +5,8 @@ import { MarketGauge } from './components/MarketGauge';
 import { NegotiationInsight } from './components/NegotiationInsight';
 
 /**
- * Don's Market Assistant - Full Logic Restored
- * Handles long-term trends, 2022 peaks, and equity calculations.
+ * Don's Market Assistant - Full Intelligence & Mobile Responsive Build
+ * Designed for Abbotsford 10-Year Historical Analysis (2015-2025)
  */
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +16,7 @@ const ChatAssistant = () => {
   ]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll logic to keep the newest messages in view
+  // Smooth scroll to the latest message in the thread
   useEffect(() => { 
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" }); 
@@ -28,7 +28,7 @@ const ChatAssistant = () => {
     setMessages(prev => [...prev, { role: 'user', text }]);
     setInput("");
 
-    // Expert logic analyzing the 10-year dataset
+    // Simulate AI analysis of the 10-year audited dataset
     setTimeout(() => {
       let res = "Looking at the 10-year audited history for Abbotsford, ";
       const q = text.toLowerCase();
@@ -53,11 +53,11 @@ const ChatAssistant = () => {
   };
 
   return (
-    <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 1000 }}>
+    <div style={{ position: 'fixed', bottom: '25px', right: '25px', zIndex: 1000 }}>
       {!isOpen ? (
         <button onClick={() => setIsOpen(true)} style={{ padding: '16px 30px', backgroundColor: '#d6b27d', color: '#041c24', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 8px 25px rgba(0,0,0,0.5)', fontSize: '0.9rem', letterSpacing: '1px' }}>💬 ASK THE MARKET ASSISTANT</button>
       ) : (
-        <div style={{ width: '400px', height: '550px', backgroundColor: '#1f333c', border: '2px solid #d6b27d', borderRadius: '12px', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.7)' }}>
+        <div style={{ width: 'min(400px, 85vw)', height: '550px', backgroundColor: '#1f333c', border: '2px solid #d6b27d', borderRadius: '12px', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.7)' }}>
           <div style={{ padding: '18px', backgroundColor: '#d6b27d', color: '#041c24', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', borderRadius: '10px 10px 0 0' }}>
             <span style={{ fontSize: '1rem' }}>Market Insights Assistant</span>
             <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem' }}>✕</button>
@@ -93,8 +93,18 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState('nov_2025');
   const [marketStats, setMarketStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  // Full 10-Year Dropdown Logic
+  // Track window size for custom responsive layout logic
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 800;
+
+  // Generate the full list of 131 months (2015-2025)
   const years = Array.from({ length: 11 }, (_, i) => 2025 - i);
   const monthsList = years.flatMap(y => 
     ["dec", "nov", "oct", "sep", "aug", "jul", "jun", "may", "apr", "mar", "feb", "jan"]
@@ -108,21 +118,31 @@ export default function App() {
       setLoading(true);
       try {
         const docSnap = await getDoc(doc(db, "abbotsford_stats", selectedMonth));
-        if (docSnap.exists()) setMarketStats(docSnap.data());
-      } catch (e) { console.error("Firebase fetch error:", e); }
+        if (docSnap.exists()) {
+          setMarketStats(docSnap.data());
+        }
+      } catch (e) {
+        console.error("Firebase fetch error:", e);
+      }
       setLoading(false);
     };
     fetchStats();
   }, [selectedMonth]);
 
-  if (loading) return <div style={{ background: '#041c24', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#d6b27d', fontSize: '1.2rem', letterSpacing: '3px' }}>ANALYZING 10 YEARS OF MARKET DATA...</div>;
+  if (loading) {
+    return (
+      <div style={{ background: '#041c24', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#d6b27d', fontSize: '1.2rem', letterSpacing: '3px' }}>
+        ANALYZING 10 YEARS OF MARKET DATA...
+      </div>
+    );
+  }
 
   const current = marketStats ? marketStats[category] : null;
 
   return (
     <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '20px', backgroundColor: '#041c24', color: 'white', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #846434', paddingBottom: '20px' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #846434', paddingBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
         <div>
           <h2 style={{ fontSize: '1.2rem', letterSpacing: '3px', margin: 0, fontWeight: 'bold' }}>DON GOERTZ | <span style={{ color: '#d6b27d' }}>Royal LePage</span></h2>
           <p style={{ fontSize: '0.8rem', color: '#d6b27d', margin: '5px 0 0 0', fontStyle: 'italic', opacity: 0.9 }}>"Friendly Service, All of the Time."</p>
@@ -131,7 +151,7 @@ export default function App() {
       </header>
 
       <section style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '4rem', fontWeight: 'bold', marginBottom: '20px', letterSpacing: '-2px' }}>Abbotsford Market <span style={{ color: '#d6b27d' }}>Pulse</span></h1>
+        <h1 style={{ fontSize: isMobile ? '2.5rem' : '4rem', fontWeight: 'bold', marginBottom: '20px', letterSpacing: '-2px' }}>Abbotsford Market <span style={{ color: '#d6b27d' }}>Pulse</span></h1>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
           {['detached', 'townhouse', 'apartment'].map(type => (
             <button key={type} onClick={() => setCategory(type)} style={{ padding: '12px 35px', backgroundColor: category === type ? '#d6b27d' : 'transparent', color: category === type ? '#041c24' : '#d6b27d', border: '2px solid #d6b27d', borderRadius: '4px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 'bold', textTransform: 'uppercase', transition: 'all 0.3s ease' }}>{type}</button>
@@ -142,25 +162,25 @@ export default function App() {
         </div>
       </section>
 
-      <main style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '30px', alignItems: 'stretch' }}>
-        <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: '30px' }}>
-          <section style={{ backgroundColor: '#1f333c', border: '1px solid #d6b27d', padding: '40px', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
+      <main style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(12, 1fr)', gap: '30px', alignItems: 'stretch' }}>
+        <div style={{ gridColumn: isMobile ? 'span 1' : 'span 8', display: 'flex', flexDirection: 'column', gap: '30px' }}>
+          <section style={{ backgroundColor: '#1f333c', border: '1px solid #d6b27d', padding: isMobile ? '25px' : '40px', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
             <h3 style={{ color: '#d6b27d', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '5px', marginBottom: '25px' }}>Benchmark Pricing Analysis</h3>
-            <p style={{ fontSize: '4.8rem', fontWeight: 'bold', color: '#d6b27d', margin: 0, lineHeight: '1' }}>{formatCurrency(current?.benchmark || 0)}</p>
+            <p style={{ fontSize: isMobile ? '3rem' : '4.8rem', fontWeight: 'bold', color: '#d6b27d', margin: 0, lineHeight: '1' }}>{formatCurrency(current?.benchmark || 0)}</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', marginTop: '40px' }}>
               <div style={{ borderLeft: '5px solid #d6b27d', paddingLeft: '30px' }}><p style={{ color: '#7c8c89', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '10px' }}>Monthly Change</p><p style={{ fontSize: '3.2rem', fontWeight: 'bold', margin: 0 }}>{current?.oneMonthChange}%</p></div>
               <div style={{ borderLeft: '5px solid #d6b27d', paddingLeft: '30px' }}><p style={{ color: '#7c8c89', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '10px' }}>Yearly Change</p><p style={{ fontSize: '3.2rem', fontWeight: 'bold', margin: 0 }}>{current?.oneYearChange}%</p></div>
             </div>
           </section>
           
-          <section style={{ backgroundColor: '#1f333c', border: '1px solid #d6b27d', padding: '40px', borderRadius: '12px', flex: 1, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
+          <section style={{ backgroundColor: '#1f333c', border: '1px solid #d6b27d', padding: isMobile ? '25px' : '40px', borderRadius: '12px', flex: 1, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
             <h3 style={{ color: '#d6b27d', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '5px', marginBottom: '25px' }}>Market Intelligence</h3>
             <NegotiationInsight ratio={current?.salesToActiveRatio || 0} type={category} />
           </section>
         </div>
 
-        <div style={{ gridColumn: 'span 4', display: 'flex' }}>
-          <div style={{ flex: 1, height: '100%' }}>
+        <div style={{ gridColumn: isMobile ? 'span 1' : 'span 4', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ width: '100%', maxWidth: '400px', height: '100%' }}>
             <MarketGauge key={`${category}-${selectedMonth}`} value={current?.salesToActiveRatio || 0} label={category} />
           </div>
         </div>
