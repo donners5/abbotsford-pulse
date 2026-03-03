@@ -1,6 +1,7 @@
 // src/data/marketData.ts
 export const auditedStats = [
   // 2025
+  { id: "dec_2025", detached: { benchmark: 1199100, salesToActiveRatio: 18.8, oneMonthChange: -1.34, oneYearChange: -0.08 }, townhouse: { benchmark: 634600, salesToActiveRatio: 22.3, oneMonthChange: -0.55, oneYearChange: -3.11 }, apartment: { benchmark: 403800, salesToActiveRatio: 16.1, oneMonthChange: -0.69, oneYearChange: -7.39 } },
   { id: "nov_2025", detached: { benchmark: 1215400, salesToActiveRatio: 14.3, oneMonthChange: -3.12, oneYearChange: -0.73 }, townhouse: { benchmark: 638100, salesToActiveRatio: 14.2, oneMonthChange: -1.02, oneYearChange: -2.83 }, apartment: { benchmark: 406600, salesToActiveRatio: 11.2, oneMonthChange: -1.14, oneYearChange: -6.89 } },
   { id: "oct_2025", detached: { benchmark: 1254600, salesToActiveRatio: 11.6, oneMonthChange: 2.63, oneYearChange: 2.65 }, townhouse: { benchmark: 644700, salesToActiveRatio: 22.2, oneMonthChange: -0.62, oneYearChange: -1.65 }, apartment: { benchmark: 411300, salesToActiveRatio: 13.9, oneMonthChange: -1.11, oneYearChange: -7.57 } },
   { id: "sep_2025", detached: { benchmark: 1222400, salesToActiveRatio: 9.9, oneMonthChange: 0.73, oneYearChange: -0.09 }, townhouse: { benchmark: 648700, salesToActiveRatio: 14.8, oneMonthChange: -0.38, oneYearChange: -2.29 }, apartment: { benchmark: 415900, salesToActiveRatio: 11.1, oneMonthChange: -1.02, oneYearChange: -3.66 } },
