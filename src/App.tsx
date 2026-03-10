@@ -5,6 +5,7 @@ import { MarketGauge } from './components/MarketGauge';
 import { NegotiationInsight } from './components/NegotiationInsight';
 import { ChatAssistant } from './ChatAssistant';
 import { uploadMonthlyData } from './adminUploader'; // Ensure this file exists
+import { runBulkFixBenchmarks } from './bulkFixBenchmarks';
 
 export default function App() {
   // 1. AUTOMATED DATE LOGIC
@@ -121,20 +122,37 @@ export default function App() {
         <div style={{ marginTop: '50px', padding: '20px', border: '2px dashed #d6b27d', borderRadius: '8px' }}>
           <h3 style={{ color: '#d6b27d' }}>ADMIN: DATA UPLOADER</h3>
           <textarea id="csvInput" style={{ width: '100%', height: '100px', background: '#1f333c', color: 'white' }} placeholder="Paste CSV lines here..." />
-          <button 
-            onClick={async () => {
-              const input = (document.getElementById('csvInput') as HTMLTextAreaElement).value;
-              const monthId = prompt("Enter ID (e.g. jan_2026)");
-              if (!monthId) return;
-              try {
-                await uploadMonthlyData(monthId, input);
-                alert('Success! Refresh to see changes.');
-              } catch (err) { alert('Error: ' + err); }
-            }}
-            style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: '#d6b27d', fontWeight: 'bold' }}
-          >
-            UPLOAD TO FIREBASE
-          </button>
+          <div style={{ marginTop: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button 
+              onClick={async () => {
+                const input = (document.getElementById('csvInput') as HTMLTextAreaElement).value;
+                const monthId = prompt("Enter ID (e.g. jan_2026)");
+                if (!monthId) return;
+                try {
+                  await uploadMonthlyData(monthId, input);
+                  alert('Success! Refresh to see changes.');
+                } catch (err) { alert('Error: ' + err); }
+              }}
+              style={{ padding: '10px 20px', backgroundColor: '#d6b27d', fontWeight: 'bold' }}
+            >
+              UPLOAD TO FIREBASE
+            </button>
+            <button
+              onClick={async () => {
+                if (!window.confirm('Run bulk benchmark fix for Jan 2015–Aug 2020? This will overwrite existing benchmarks in Firebase.')) return;
+                try {
+                  await runBulkFixBenchmarks();
+                  alert('Bulk benchmark fix completed. Refresh and spot-check early years.');
+                } catch (err) {
+                  console.error(err);
+                  alert('Bulk fix error: ' + (err as any)?.message);
+                }
+              }}
+              style={{ padding: '10px 20px', backgroundColor: '#1f333c', color: '#d6b27d', fontWeight: 'bold', border: '1px solid #d6b27d' }}
+            >
+              RUN BULK BENCHMARK FIX
+            </button>
+          </div>
         </div>
       )}
     </div>

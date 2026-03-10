@@ -121,25 +121,6 @@ export const ChatAssistant = ({ category: propCategory, monthId }: ChatAssistant
     recognitionRef.current = recognition;
     setHasSpeechSupport(true);
 
-    // #region agent log
-    fetch('http://127.0.0.1:7605/ingest/4b41fc8c-7b58-4b49-9ac1-5b0181f74fcb', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Debug-Session-Id': 'f0d06d'
-      },
-      body: JSON.stringify({
-        sessionId: 'f0d06d',
-        runId: 'voice_init',
-        hypothesisId: 'V1',
-        location: 'src/ChatAssistant.tsx:voice-init',
-        message: 'Speech recognition support detected',
-        data: { hasSpeechSupport: true },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
-
     return () => {
       recognition.onresult = null;
       recognition.onend = null;
@@ -164,25 +145,6 @@ export const ChatAssistant = ({ category: propCategory, monthId }: ChatAssistant
         setIsListening(false);
       }
     }
-
-    // #region agent log
-    fetch('http://127.0.0.1:7605/ingest/4b41fc8c-7b58-4b49-9ac1-5b0181f74fcb', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Debug-Session-Id': 'f0d06d'
-      },
-      body: JSON.stringify({
-        sessionId: 'f0d06d',
-        runId: 'voice_toggle',
-        hypothesisId: 'V2',
-        location: 'src/ChatAssistant.tsx:toggleListening',
-        message: 'Voice listening toggled',
-        data: { isListeningAfterToggle: !isListening },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
   };
 
   // --- 4. CORE RESPONSE ENGINE ---
@@ -197,7 +159,23 @@ export const ChatAssistant = ({ category: propCategory, monthId }: ChatAssistant
 
     setTimeout(() => {
       const q = userMsg.toLowerCase();
-      
+
+      // --- 4a. INTENT: SHOULD I BUY/SELL GUARDRAIL ---
+      const sellBuyPhrases = [
+        'good time to sell',
+        'good time to buy',
+        'should i sell',
+        'should i buy',
+        'is now a good time to sell',
+        'is now a good time to buy',
+        'time to sell',
+        'time to buy'
+      ];
+      const isSellBuyIntent = sellBuyPhrases.some(p => q.includes(p)) || (
+        (q.includes('sell') || q.includes('buy')) &&
+        (q.includes('now') || q.includes('time') || q.includes('today'))
+      );
+
       // Category Resolution
       let cat: 'detached' | 'townhouse' | 'apartment' = propCategory.toLowerCase() as any;
       if (q.includes("apartment")) cat = "apartment";
@@ -236,8 +214,20 @@ export const ChatAssistant = ({ category: propCategory, monthId }: ChatAssistant
 
       let res = "";
 
+      // Follow-up "yes" after sales volume prompt → treat as sales question
+      const lastMessage = messages[messages.length - 1];
+      const isSalesFollowupYes =
+        ['yes', 'yeah', 'yep', 'sure'].includes(q.trim()) &&
+        lastMessage?.role === 'bot' &&
+        lastMessage.text.toLowerCase().includes('would you like to see the sales volume');
+
+      // --- 4b. GUARDRAIL RESPONSE FOR BUY/SELL TIMING ---
+      if (isSellBuyIntent) {
+        const ratio = stats?.salesToActiveRatio ?? activeData[cat]?.salesToActiveRatio ?? 0;
+        res = `I'm a market data assistant, not a licensed advisor, so I can't tell you whether now is the right time for you personally to buy or sell. What I can say is that the current ${cat} benchmark for ${displayDate} is $${(stats?.benchmark ?? activeData[cat]?.benchmark ?? 0).toLocaleString()} with a sales-to-active ratio of ${ratio}%. To map this data to your specific home and goals, it's best to speak directly with Don — use the 'Book Call' button at the top of the app to schedule a strategy call.`;
+      }
       // Intent Mapping
-      if (q.includes("price") || q.includes("benchmark") || q.includes("worth")) {
+      else if (q.includes("price") || q.includes("benchmark") || q.includes("worth")) {
         if (stats && stats.benchmark) {
           const change = stats.oneYearChange || 0;
           res = `The ${cat} benchmark for ${displayDate} was $${stats.benchmark.toLocaleString()}. This represents a ${Math.abs(change)}% ${change > 0 ? 'increase' : 'decrease'} compared to the previous year.`;
@@ -245,7 +235,7 @@ export const ChatAssistant = ({ category: propCategory, monthId }: ChatAssistant
           res = `I'm locating the ${cat} price data for ${displayDate}. While the specific benchmark is being indexed, the segment remains active. Would you like to see sales volume?`;
         }
       } 
-      else if (q.includes("sales") || q.includes("sold") || q.includes("how many")) {
+      else if (q.includes("sales") || q.includes("sold") || q.includes("how many") || isSalesFollowupYes) {
         const sales = stats?.sales || (hiddenStats as any)[targetId]?.[cat]?.sales;
         if (sales !== undefined) {
           res = `In ${displayDate}, there were ${sales} ${cat} sales recorded in the dataset.`;
