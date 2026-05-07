@@ -1,5 +1,11 @@
 // src/data/marketData.ts
 export const auditedStats = [
+  // 2026
+  { id: "apr_2026", detached: { benchmark: 1186600, salesToActiveRatio: 14.2, oneMonthChange: -0.19, oneYearChange: -4.48 }, townhouse: { benchmark: 610900, salesToActiveRatio: 12.9, oneMonthChange: -2.18, oneYearChange: -7.66 }, apartment: { benchmark: 400400, salesToActiveRatio: 13.0, oneMonthChange: 1.14, oneYearChange: -8.23 } },
+  { id: "mar_2026", detached: { benchmark: 1188800, salesToActiveRatio: 13.6, oneMonthChange: 2.22, oneYearChange: -5.03 }, townhouse: { benchmark: 624500, salesToActiveRatio: 18.2, oneMonthChange: -0.26, oneYearChange: -5.66 }, apartment: { benchmark: 395900, salesToActiveRatio: 18.4, oneMonthChange: -1.22, oneYearChange: -10.41 } },
+  { id: "feb_2026", detached: { benchmark: 1163000, salesToActiveRatio: 9.1, oneMonthChange: -0.74, oneYearChange: -6.79 }, townhouse: { benchmark: 626100, salesToActiveRatio: 11.4, oneMonthChange: -1.03, oneYearChange: -5.22 }, apartment: { benchmark: 400800, salesToActiveRatio: 16.4, oneMonthChange: 0.83, oneYearChange: -10.19 } },
+  { id: "jan_2026", detached: { benchmark: 1171700, salesToActiveRatio: 8.9, oneMonthChange: -2.29, oneYearChange: -5.33 }, townhouse: { benchmark: 632600, salesToActiveRatio: 13.9, oneMonthChange: -0.32, oneYearChange: -4.28 }, apartment: { benchmark: 397500, salesToActiveRatio: 17.8, oneMonthChange: -1.56, oneYearChange: -9.54 } },
+
   // 2025
   { id: "dec_2025", detached: { benchmark: 1199100, salesToActiveRatio: 18.8, oneMonthChange: -1.34, oneYearChange: -0.08 }, townhouse: { benchmark: 634600, salesToActiveRatio: 22.3, oneMonthChange: -0.55, oneYearChange: -3.11 }, apartment: { benchmark: 403800, salesToActiveRatio: 16.1, oneMonthChange: -0.69, oneYearChange: -7.39 } },
   { id: "nov_2025", detached: { benchmark: 1215400, salesToActiveRatio: 14.3, oneMonthChange: -3.12, oneYearChange: -0.73 }, townhouse: { benchmark: 638100, salesToActiveRatio: 14.2, oneMonthChange: -1.02, oneYearChange: -2.83 }, apartment: { benchmark: 406600, salesToActiveRatio: 11.2, oneMonthChange: -1.14, oneYearChange: -6.89 } },

@@ -2,6 +2,10 @@
 /* COMPLETE 10-YEAR LOCALIZED ABBOTSFORD DATA (F70) */
 
 export const hiddenStats: Record<string, any> = {
+  "apr_2026": { detached: { activeListings: 430, newListings: 183, sales: 61 }, townhouse: { activeListings: 279, sales: 36, newListings: 123 }, apartment: { activeListings: 345, sales: 45, newListings: 134 } },
+  "mar_2026": { detached: { activeListings: 389, newListings: 150, sales: 53 }, townhouse: { activeListings: 253, sales: 46, newListings: 117 }, apartment: { activeListings: 321, sales: 59, newListings: 159 } },
+  "feb_2026": { detached: { activeListings: 353, newListings: 134, sales: 32 }, townhouse: { activeListings: 220, sales: 25, newListings: 95 }, apartment: { activeListings: 293, sales: 48, newListings: 111 } },
+  "jan_2026": { detached: { activeListings: 338, newListings: 124, sales: 30 }, townhouse: { activeListings: 202, sales: 28, newListings: 118 }, apartment: { activeListings: 247, sales: 44, newListings: 153 } },
 "dec_2025": { detached: { activeListings: 293, newListings: 54, sales: 55 }, townhouse: { activeListings: 157, sales: 35, newListings: 37 }, apartment: { activeListings: 242, sales: 39, newListings: 54 } },  "nov_2025": { detached: { activeListings: 413, newListings: 112, sales: 59 }, townhouse: { activeListings: 197, sales: 28, newListings: 78 }, apartment: { activeListings: 338, sales: 38, newListings: 90 } },
   "oct_2025": { detached: { activeListings: 464, newListings: 137, sales: 54 }, townhouse: { activeListings: 225, sales: 50, newListings: 83 }, apartment: { activeListings: 359, sales: 50, newListings: 136 } },
   "sep_2025": { detached: { activeListings: 485, newListings: 164, sales: 48 }, townhouse: { activeListings: 250, sales: 37, newListings: 87 }, apartment: { activeListings: 371, sales: 41, newListings: 143 } },
